@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { db } from "../config/pool";
 import { NewUser } from "../entities/User";
-import { users } from "../schemas";
+import { comments, posts, users } from "../schemas";
 import logger from "../utils/logger";
 
 export const userModel = {
@@ -11,7 +11,6 @@ export const userModel = {
                 .select({
                     id: users.id,
                     username: users.username,
-                    email: users.email,
                 })
                 .from(users)
                 .execute();
@@ -30,6 +29,15 @@ export const userModel = {
                 .select({
                     id: users.id,
                     username: users.username,
+                    comments: {
+                        id: comments.id,
+                        content: comments.content,
+                    },
+                    posts: {
+                        id: posts.id,
+                        title: posts.title,
+                        content: posts.content,
+                    },
                     email: users.email,
                 })
                 .from(users)
@@ -47,7 +55,12 @@ export const userModel = {
     findByCredentials: (email: string) => {
         try {
             return db
-                .select()
+                .select({
+                    id: users.id,
+                    username: users.username,
+                    email: users.email,
+                    password: users.password,
+                })
                 .from(users)
                 .where(eq(users.email, email))
                 .execute();
