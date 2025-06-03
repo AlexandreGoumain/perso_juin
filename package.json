@@ -15,17 +15,21 @@
     "license": "ISC",
     "packageManager": "pnpm@10.4.1",
     "dependencies": {
+        "cookie-parser": "^1.4.7",
         "cors": "^2.8.5",
         "dotenv": "^16.5.0",
         "drizzle-orm": "^0.44.1",
         "express": "^5.1.0",
+        "jsonwebtoken": "^9.0.2",
         "pg": "^8.16.0",
         "postgres": "^3.4.7",
         "winston": "^3.17.0"
     },
     "devDependencies": {
+        "@types/cookie-parser": "^1.4.8",
         "@types/cors": "^2.8.18",
         "@types/express": "^5.0.2",
+        "@types/jsonwebtoken": "^9.0.9",
         "@types/node": "^22.15.29",
         "@types/pg": "^8.15.4",
         "concurrently": "^9.1.2",
