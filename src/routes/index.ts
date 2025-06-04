@@ -3,6 +3,7 @@
 import { Router } from "express";
 import commentRouter from "./comments.routes";
 import postRouter from "./posts.routes";
+import userRouter from "./users.routes";
 
 const router = Router();
 
@@ -13,6 +14,7 @@ router.use("/posts", postRouter);
 router.use("/comments", commentRouter);
 
 // http://localhost:3000/users
+router.use("/users", userRouter);
 
 export default router;
 

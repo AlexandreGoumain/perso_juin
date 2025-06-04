@@ -1,5 +1,7 @@
 import { Router } from "express";
 import { postsController } from "../controllers/posts.controller";
+import { validateRequest } from "../middlewares";
+import { postCreateValidation } from "../validations";
 
 const postRouter = Router();
 
@@ -7,7 +9,11 @@ const postRouter = Router();
 
 postRouter.get("/", postsController.getAll);
 postRouter.get("/:id", postsController.get);
-postRouter.post("/", postsController.create);
+postRouter.post(
+    "/",
+    validateRequest(postCreateValidation),
+    postsController.create
+);
 postRouter.put("/:id", postsController.update);
 postRouter.delete("/:id", postsController.delete);
 

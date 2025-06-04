@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { postModel } from "../models/posts.model";
+import { userModel } from "../models/users.model";
 import logger from "../utils/logger";
 import { APIResponse } from "../utils/response";
 
@@ -53,16 +54,17 @@ export const postsController = {
         try {
             const { title, content, author } = req.body;
 
-            if (!title || !content || !author) {
-                return APIResponse(
-                    res,
-                    null,
-                    "Titre, contenu et auteur sont requis",
-                    400
-                );
+            const user = await userModel.get(author);
+
+            if (!user) {
+                return APIResponse(res, null, "Auteur non trouvé", 404);
             }
 
-            const newPost = await postModel.create({ title, content, author });
+            const newPost = await postModel.create({
+                title,
+                content,
+                author: user.id,
+            });
             APIResponse(res, newPost[0], "Post créé avec succès", 201);
         } catch (error: any) {
             logger.error("Erreur lors de la création du post:", error.message);
@@ -75,15 +77,6 @@ export const postsController = {
         try {
             const { id } = req.params;
             const { title, content, author } = req.body;
-
-            if (!title || !content || !author) {
-                return APIResponse(
-                    res,
-                    null,
-                    "Titre, contenu et auteur sont requis",
-                    400
-                );
-            }
 
             await postModel.update(id, author, {
                 title,

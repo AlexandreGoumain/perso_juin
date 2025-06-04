@@ -29,11 +29,11 @@ export const usersController = {
             const { id } = req.params;
             const user = await userModel.get(id);
 
-            if (!user || user.length === 0) {
+            if (!user) {
                 return APIResponse(res, null, "Utilisateur non trouvé", 404);
             }
 
-            APIResponse(res, user[0], "Utilisateur récupéré avec succès", 200);
+            APIResponse(res, user, "Utilisateur récupéré avec succès", 200);
         } catch (error: any) {
             logger.error(
                 "Erreur lors de la récupération de l'utilisateur:",
@@ -52,15 +52,6 @@ export const usersController = {
     create: async (req: Request, res: Response) => {
         try {
             const { username, email, password } = req.body;
-
-            if (!username || !email || !password) {
-                return APIResponse(
-                    res,
-                    null,
-                    "Username, email et password sont requis",
-                    400
-                );
-            }
 
             const newUser = await userModel.create({
                 username,
@@ -98,13 +89,9 @@ export const usersController = {
         try {
             const { email } = req.body;
 
-            if (!email) {
-                return APIResponse(res, null, "Email requis", 400);
-            }
-
             const user = await userModel.findByCredentials(email);
 
-            if (!user || user.length === 0) {
+            if (!user) {
                 return APIResponse(res, null, "Utilisateur non trouvé", 404);
             }
 

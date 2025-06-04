@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { db } from "../config/pool";
 import { NewUser } from "../entities/User";
-import { comments, posts, users } from "../schemas";
+import { users } from "../schemas";
 import logger from "../utils/logger";
 
 export const userModel = {
@@ -25,30 +25,40 @@ export const userModel = {
 
     get: (id: string) => {
         try {
-            return db
-                .select({
-                    id: users.id,
-                    username: users.username,
-                    comments: {
-                        id: comments.id,
-                        content: comments.content,
-                    },
+            return db.query.users.findFirst({
+                where: eq(users.id, id),
+                with: {
                     posts: {
-                        id: posts.id,
-                        title: posts.title,
-                        content: posts.content,
+                        columns: {
+                            id: true,
+                            title: true,
+                            content: true,
+                            created_at: true,
+                        },
                     },
-                    email: users.email,
-                })
-                .from(users)
-                .where(eq(users.id, id))
-                .execute();
+                    comments: {
+                        columns: {
+                            id: true,
+                            content: true,
+                            createdAt: true,
+                        },
+                        with: {
+                            post: {
+                                columns: {
+                                    id: true,
+                                    title: true,
+                                },
+                            },
+                        },
+                    },
+                },
+            });
         } catch (err: any) {
             logger.error(
                 "Impossible de récupérer l'utilisateur: ",
                 err.message
             );
-            throw new Error("L'utilisateur ne peut pas être récupéré");
+            return null;
         }
     },
 
@@ -75,6 +85,27 @@ export const userModel = {
 
     create: (user: NewUser) => {
         try {
+            if (!user.email) {
+                throw new Error("L'email est obligatoire");
+            }
+            if (!user.username) {
+                throw new Error("Le nom d'utilisateur est obligatoire");
+            }
+            if (!user.password) {
+                throw new Error("Le mot de passe est obligatoire");
+            }
+
+            // vérifier si l'email est déjà utilisé
+            const existingUser = db
+                .select()
+                .from(users)
+                .where(eq(users.email, user.email))
+                .execute();
+
+            if (existingUser !== null) {
+                throw new Error("Cet email est déjà utilisé");
+            }
+
             return db
                 .insert(users)
                 .values(user)
